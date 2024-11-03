@@ -41,7 +41,7 @@ __all__ = (
     "SPPELAN",
     "CBFuse",
     "CBLinear",
-    "Silence",
+    # "Silence",
     "C2fKAN",
     "SPPFWithKAN",
     "C3k2",

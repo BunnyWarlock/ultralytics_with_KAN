@@ -55,7 +55,7 @@ from .block import (
     RepNCSPELAN4,
     RepVGGDW,
     ResNetLayer,
-    Silence,
+    # Silence,
     C2fKAN,
     SPPFWithKAN,
     SCDown,
@@ -153,7 +153,7 @@ __all__ = (
     "SPPELAN",
     "CBFuse",
     "CBLinear",
-    "Silence",
+    # "Silence",
     "ConvWithKAN",
     "C2fKAN",
     "SPPFWithKAN"
