@@ -14,6 +14,9 @@ try:
 except (ImportError, AssertionError):
     wb = None
 
+# add this to disable wandb logging
+wb = None
+
 
 def _custom_table(x, y, classes, title="Precision Recall Curve", x_title="Recall", y_title="Precision"):
     """
