@@ -25,6 +25,7 @@ from .block import (
     C3TR,
     CIB,
     DFL,
+    DFLWithKAN,
     ELAN1,
     PSA,
     SPP,
@@ -35,6 +36,7 @@ from .block import (
     Attention,
     BNContrastiveHead,
     Bottleneck,
+    BottleneckWithKAN,
     BottleneckCSP,
     C2f,
     C2fAttn,
@@ -68,6 +70,7 @@ from .conv import (
     Conv2,
     ConvTranspose,
     DWConv,
+    DWConvWithKAN,
     DWConvTranspose2d,
     Focus,
     GhostConv,
@@ -76,7 +79,7 @@ from .conv import (
     SpatialAttention,
     ConvWithKAN
 )
-from .head import OBB, Classify, Detect, Pose, RTDETRDecoder, Segment, WorldDetect, v10Detect
+from .head import OBB, Classify, Detect, DetectWithKAN, Pose, RTDETRDecoder, Segment, WorldDetect, v10Detect
 from .transformer import (
     AIFI,
     MLP,
@@ -96,6 +99,7 @@ __all__ = (
     "LightConv",
     "RepConv",
     "DWConv",
+    "DWConvWithKAN",
     "DWConvTranspose2d",
     "ConvTranspose",
     "Focus",
@@ -109,6 +113,7 @@ __all__ = (
     "MLPBlock",
     "LayerNorm2d",
     "DFL",
+    "DFLWithKAN",
     "HGBlock",
     "HGStem",
     "SPP",
@@ -127,9 +132,11 @@ __all__ = (
     "C3Ghost",
     "GhostBottleneck",
     "Bottleneck",
+    "BottleneckWithKAN",
     "BottleneckCSP",
     "Proto",
     "Detect",
+    "DetectWithKAN",
     "Segment",
     "Pose",
     "Classify",
@@ -156,7 +163,7 @@ __all__ = (
     # "Silence",
     "ConvWithKAN",
     "C2fKAN",
-    "SPPFWithKAN"
+    "SPPFWithKAN",
     "AConv",
     "ELAN1",
     "RepVGGDW",
