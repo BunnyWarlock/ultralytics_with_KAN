@@ -10,7 +10,7 @@ from torch.nn.init import constant_, xavier_uniform_
 
 from ultralytics.utils.tal import TORCH_1_10, dist2bbox, dist2rbox, make_anchors
 
-from .block import DFL, DFLWithKAN, BNContrastiveHead, ContrastiveHead, Proto
+from .block import DFL, BNContrastiveHead, ContrastiveHead, Proto
 from .conv import Conv, ConvWithKAN, DWConv, DWConvWithKAN
 from .transformer import MLP, DeformableTransformerDecoder, DeformableTransformerDecoderLayer
 from .utils import bias_init_with_prob, linear_init
@@ -203,7 +203,7 @@ class DetectWithKAN(nn.Module):
                 for x in ch
             )
         )
-        self.dfl = DFLWithKAN(self.reg_max) if self.reg_max > 1 else nn.Identity()
+        self.dfl = DFL(self.reg_max) if self.reg_max > 1 else nn.Identity()
 
         if self.end2end:
             self.one2one_cv2 = copy.deepcopy(self.cv2)
