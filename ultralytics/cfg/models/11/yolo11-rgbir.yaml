@@ -1,0 +1,96 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# YOLO11 object detection model with P3-P5 outputs. For Usage examples see https://docs.ultralytics.com/tasks/detect
+
+# Parameters
+nc: 2 # number of classes
+scales: # model compound scaling constants, i.e. 'model=yolo11n.yaml' will call yolo11.yaml with scale 'n'
+  # [depth, width, max_channels]
+  n: [0.50, 0.25, 1024]
+  s: [0.50, 0.50, 1024]
+  m: [0.50, 1.00, 512]
+  l: [1.00, 1.00, 512]
+  x: [1.00, 1.50, 512]
+
+# YOLO11n backbone
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, nn.Identity, []] # 0
+
+  # RGB Backbone
+  - [0, 1, RGBIRSeperate, [False]] # 1
+  - [-1, 1, Conv, [64, 3, 2]] # 2-P1/2
+  - [-1, 1, Conv, [128, 3, 2]] # 3-P2/4
+  - [-1, 2, C3k2, [256, False, 0.25]] # 4
+  - [-1, 1, Conv, [256, 3, 2]] # 5-P3/8
+  - [-1, 2, C3k2, [512, False, 0.25]] # 6 **
+  - [-1, 1, Conv, [512, 3, 2]] # 7-P4/16
+  - [-1, 2, C3k2, [512, True]] # 8 **
+  - [-1, 1, Conv, [1024, 3, 2]] # 9-P5/32
+  - [-1, 2, C3k2, [1024, True]] # 10
+  - [-1, 1, SPPF, [1024, 5]] # 11
+  - [-1, 2, C2PSA, [1024]] # 12 **
+
+  # IR Backbone
+  - [0, 1, RGBIRSeperate, [True]] # 13
+  - [-1, 1, Conv, [64, 3, 2]] # 14-P1/2
+  - [-1, 1, Conv, [128, 3, 2]] # 15-P2/4
+  - [-1, 2, C3k2, [256, False, 0.25]] # 16
+  - [-1, 1, Conv, [256, 3, 2]] # 17-P3/8
+  - [-1, 2, C3k2, [512, False, 0.25]] # 18 **
+  - [-1, 1, Conv, [512, 3, 2]] # 19-P4/16
+  - [-1, 2, C3k2, [512, True]] # 20 **
+  - [-1, 1, Conv, [1024, 3, 2]] # 21-P5/32
+  - [-1, 2, C3k2, [1024, True]] # 22
+  - [-1, 1, SPPF, [1024, 5]] # 23
+  - [-1, 2, C2PSA, [1024]] # 24 **
+
+  # RGB-IR Fusion
+  - [[6, 18], 1, Concat, [1]] # 25
+  - [-1, 1, Bottleneck, [512, False]] # 26
+  - [[8, 20], 1, Concat, [1]] # 27
+  - [-1, 1, Bottleneck, [512, False]] # 28
+  - [[12, 24], 1, Concat, [1]] # 29
+  - [-1, 1, Bottleneck, [1024, False]] # 30
+
+# YOLO11n head
+head:
+  - [30, 1, nn.Upsample, [None, 2, "nearest"]] # 31
+  - [[-1, 28], 1, Concat, [1]] # 32-cat backbone P4
+  - [-1, 2, C3k2, [512, False]] # 33
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]] # 34
+  - [[-1, 26], 1, Concat, [1]] # 35-cat backbone P3
+  - [-1, 2, C3k2, [256, False]] # 36 (P3/8-small)
+
+  - [-1, 1, Conv, [256, 3, 2]] # 37
+  - [[-1, 33], 1, Concat, [1]] # 38-cat head P4
+  - [-1, 2, C3k2, [512, False]] # 39 (P4/16-medium)
+
+  - [-1, 1, Conv, [512, 3, 2]] # 40
+  - [[-1, 30], 1, Concat, [1]] # 41-cat head P5
+  - [-1, 2, C3k2, [1024, True]] # 42 (P5/32-large)
+
+  - [[36, 39, 42], 1, Detect, [nc]] # 43-Detect(P3, P4, P5)
+
+module:
+  init: |
+    import torch
+    import torch.nn as nn
+
+    class RGBIRSeperate(nn.Module):
+        def __init__(self, ir=False):
+            super().__init__()
+            self.ir = ir
+
+        def forward(self, x):
+            if self.ir:
+                # Take the 4th channel (index 3), add channel dimension
+                x = x[:, 3:4, :, :]
+            else:
+                # Take the first 3 channels
+                x = x[:, 0:3, :, :]
+            return x
+  parse: |
+    if m is RGBIRSeperate:
+      c1 = 4  # Input is 4-channel image (RGB+IR)
+      c2 = 1 if args[0] else 3  # Output depends on ir
