@@ -445,7 +445,7 @@ class BottleneckFusionK(nn.Module):
     def __init__(self, c1, c2, shortcut=True, g=1, k=(3, 3), e=0.5):
         super().__init__()
         self.b = Bottleneck(c1, c1, shortcut, g, k, e)
-        self.cv = ConvWithKAN(c1, c2, k[1], 1)
+        self.cv = ConvWithKAN(c1, c2, k[1], 1, g=g)
 
     def forward(self, x):
         return self.cv(self.b(x))
