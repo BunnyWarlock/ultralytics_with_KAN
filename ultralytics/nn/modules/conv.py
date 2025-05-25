@@ -80,7 +80,7 @@ class ConvWithKAN(nn.Module):
         return self.conv(x)  
 
 class RGBIRSeperateConvK(nn.Module):
-    """Takes in a 4-channel input (RGB and IR) and applies a convolution to the selected group."""
+    """Processes 4-channel input: extracts IR (last 1) or RGB (first 3) depending on `ir` flag."""
 
     def __init__(self, c1, c2, ir, k=1, s=1, p=None, g=1, d=1, act=True):
         super().__init__()
@@ -90,13 +90,11 @@ class RGBIRSeperateConvK(nn.Module):
 
     def forward(self, x):
         if self.ir:
-            if x.shape[1] < 4:
-                raise ValueError(f"Expected at least 4 channels for IR input, got {x.shape[1]}")
-            x = x[:, 3:4, :, :]  # IR channel
+            # Use last channel (safe slicing even if <4 channels)
+            x = x[:, -1:, :, :]
         else:
-            if x.shape[1] < 3:
-                raise ValueError(f"Expected at least 3 channels for RGB input, got {x.shape[1]}")
-            x = x[:, 0:3, :, :]  # RGB channels
+            # Use first 3 channels (safe slicing even if <3 channels)
+            x = x[:, :3, :, :]
         return self.cv(x)
 
 class Conv2(Conv):
