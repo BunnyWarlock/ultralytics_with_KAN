@@ -19,7 +19,7 @@ backbone:
 
   # RGB Backbone
   - [0, 1, RGBIRSeperate, [3]] # 1
-  - [-1, 1, Conv, [64, 3, 2]] # 2-P1/2
+  - [0, 1, Conv, [64, 3, 2]] # 2-P1/2
   - [-1, 1, Conv, [128, 3, 2]] # 3-P2/4
   - [-1, 2, C3k2, [256, False, 0.25]] # 4
   - [-1, 1, Conv, [256, 3, 2]] # 5-P3/8
@@ -33,7 +33,7 @@ backbone:
 
   # IR Backbone
   - [0, 1, RGBIRSeperate, [1]] # 13
-  - [-1, 1, Conv, [64, 3, 2]] # 14-P1/2
+  - [0, 1, Conv, [64, 3, 2]] # 14-P1/2
   - [-1, 1, Conv, [128, 3, 2]] # 15-P2/4
   - [-1, 2, C3k2, [256, False, 0.25]] # 16
   - [-1, 1, Conv, [256, 3, 2]] # 17-P3/8
@@ -47,11 +47,11 @@ backbone:
 
   # RGB-IR Fusion
   - [[6, 18], 1, Concat, [1]] # 25
-  - [-1, 1, Bottleneck, [512, True]] # 26
+  - [-1, 1, BottleneckFusionK, [512, True]] # 26
   - [[8, 20], 1, Concat, [1]] # 27
-  - [-1, 1, Bottleneck, [512, True]] # 28
+  - [-1, 1, BottleneckFusionK, [512, True]] # 28
   - [[12, 24], 1, Concat, [1]] # 29
-  - [-1, 1, Bottleneck, [1024, True]] # 30
+  - [-1, 1, BottleneckFusionK, [1024, True]] # 30
 
 # YOLO11n head
 head:
