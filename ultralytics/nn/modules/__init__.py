@@ -38,7 +38,6 @@ from .block import (
     BottleneckWithKAN,
     BottleneckCSP,
     BottleneckFusionK,
-    RGBIRSeperate,
     C2f,
     C2fAttn,
     C2fCIB,
@@ -78,7 +77,8 @@ from .conv import (
     LightConv,
     RepConv,
     SpatialAttention,
-    ConvWithKAN
+    ConvWithKAN,
+    RGBIRSeperateConvK,
 )
 from .head import OBB, Classify, Detect, DetectWithKAN, Pose, RTDETRDecoder, Segment, WorldDetect, v10Detect
 from .transformer import (
@@ -135,7 +135,6 @@ __all__ = (
     "BottleneckWithKAN",
     "BottleneckCSP",
     "BottleneckFusionK",
-    "RGBIRSeperate",
     "Proto",
     "Detect",
     "DetectWithKAN",
@@ -164,6 +163,7 @@ __all__ = (
     "CBLinear",
     # "Silence",
     "ConvWithKAN",
+    "RGBIRSeperateConvK",
     "C2fKAN",
     "SPPFWithKAN",
     "AConv",

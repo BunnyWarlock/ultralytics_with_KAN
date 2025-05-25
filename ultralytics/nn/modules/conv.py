@@ -24,7 +24,8 @@ __all__ = (
     "CBAM",
     "Concat",
     "RepConv",
-    "ConvWithKAN"
+    "ConvWithKAN",
+    "RGBIRSeperateConvK"
 )
 
 
@@ -76,7 +77,25 @@ class ConvWithKAN(nn.Module):
 
     def forward_fuse(self, x):
         """Perform transposed convolution of 2D data."""
-        return self.conv(x)
+        return self.conv(x)  
+
+class RGBIRSeperateConvK(nn.Module):
+    """Takes in a 4-channel input (RGB and IR) and seperates the RGB and IR depending on the c2"""
+
+    def __init__(self, c1, c2, ir, k=1, s=1, p=None, g=1, d=1, act=True):
+        super().__init__()
+        self.ir = ir
+        c_ = 1 if ir else 3
+        self.cv = ConvWithKAN(c_, c2, k, s, p, g, d, act)
+    
+    def forward(self, x):
+        if self.ir:
+            # Take the 4th channel (index 3), add channel dimension
+            x = x[:, 3:4, :, :]
+        else:
+            # Take the first 3 channels
+            x = x[:, 0:3, :, :]
+        return self.cv(x)
 
 class Conv2(Conv):
     """Simplified RepConv module with Conv fusing."""
