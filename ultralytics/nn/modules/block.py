@@ -34,6 +34,8 @@ __all__ = (
     "Bottleneck",
     "BottleneckCSP",
     "BottleneckWithKAN",
+    "BottleneckFusionK",
+    "RGBIRSeperate",
     "Proto",
     "RepC3",
     "ResNetLayer",
@@ -435,6 +437,34 @@ class BottleneckCSP(nn.Module):
         y1 = self.cv3(self.m(self.cv1(x)))
         y2 = self.cv2(x)
         return self.cv4(self.act(self.bn(torch.cat((y1, y2), 1))))
+    
+
+class BottleneckFusionK(nn.Module):
+    """Fuses the output of two sepeate backbone to be passed onto the neck/head"""
+
+    def __init__(self, c1, c2, shortcut=True, g=1, k=(3, 3), e=0.5):
+        super().__init__()
+        self.b = Bottleneck(c1, c1, shortcut, g, k, e)
+        self.cv = ConvWithKAN(c1, c2, k[1], 1, g=g)
+
+    def forward(self, x):
+        return self.cv(self.b(x))
+    
+
+class RGBIRSeperate(nn.Module):
+    """Takes in a 4-channel input (RGB and IR) and seperates the RGB and IR depending on the c2"""
+    def __init__(self, c1, c2):
+        super().__init__()
+        self.ir = (c2 == 1)
+    
+    def forward(self, x):
+        if self.ir:
+            # Take the 4th channel (index 3), add channel dimension
+            x = x[:, 3:4, :, :]
+        else:
+            # Take the first 3 channels
+            x = x[:, 0:3, :, :]
+        return x
 
 
 class ResNetBlock(nn.Module):
